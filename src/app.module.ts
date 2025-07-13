@@ -4,6 +4,8 @@ import { DataSource } from 'typeorm';
 import { databaseConfig } from './database/config';
 import { OrdersModule } from './orders/orders.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     OrdersModule,
   ],
+     controllers: [AppController],
+   providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
   constructor(private readonly dataSource: DataSource) {}
