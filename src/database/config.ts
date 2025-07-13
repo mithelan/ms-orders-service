@@ -11,6 +11,5 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
     database: configService.get<string>('DATABASE', 'orders_iit_db'),
     autoLoadEntities: true,
     synchronize: true,
-    
   };
 }
