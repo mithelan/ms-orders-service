@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: 537824365278.dkr.ecr.ap-southeast-1.amazonaws.com/ms-orders-image
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3005
+
+env:
+  DATABASE: orders_iit_db
+  DB_PORT: "3306"
+  HOST: mysql-db
+  PASSWORD: root1234
+  PORT: "3005"
+  USERNAME: root
+  GAMES_ENDPOINT: http://localhost:3002
+
+ingress:
+  enabled: true
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  hosts:
+    - host: orders.lugx.com
+      paths:
+        - path: /
+          pathType: Prefix
+  ingressClassName: alb

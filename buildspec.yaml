@@ -1,0 +1,61 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+
+      # - echo "Installing kubectl (Linux x86_64)..."
+      # - curl -LO https://s3.us-west-2.amazonaws.com/amazon-eks/1.33.0/2025-05-01/bin/linux/amd64/kubectl
+      # - chmod +x kubectl
+      # - mv kubectl /usr/local/bin/kubectl
+      # - kubectl version --client
+
+      # - echo "Confirming AWS CLI identity..."
+      # - aws sts get-caller-identity
+      # - echo "Testing cluster access..."
+      #   kubectl auth can-i list nodes
+
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ms-orders-service
+      - IMAGE_TAG=latest
+      - echo "REPOSITORY_URI=$REPOSITORY_URI"
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
+  build:
+    commands:
+      - echo "Running unit tests..."
+      - npm install
+      - npm run test
+
+      # - echo "Running integration tests..."
+      # - npm run test:int
+
+
+      - echo "Building Docker image for linux/amd64..."
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions...
+      - printf '[{"name":"ms-orders-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
+      
+      # - echo "Setting up kubeconfig with aws-iam-authenticator..."
+      # - aws eks update-kubeconfig --region ap-southeast-1 --name ms-lugx-cluster
+  
+      # - echo "Testing cluster connection..."
+      # - kubectl get svc
+  
+      # - echo "Deploying to EKS using rolling update..."
+      # - kubectl set image deployment/ms-orders-deployment ms-orders-service=$REPOSITORY_URI:$IMAGE_TAG
+      # - kubectl rollout status deployment/ms-orders-deployment
+
+
+artifacts:
+  files:
+    - imagedefinitions.json

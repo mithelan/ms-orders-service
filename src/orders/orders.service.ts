@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { GAMES_URL } from '../constants/games.constant';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { DataSource, Repository } from 'typeorm';
 import { GamesClientService } from './games.service';
+import { OrderItem } from './entities/order.item.entity';
 
 @Injectable()
 export class OrdersService {
@@ -15,43 +14,70 @@ export class OrdersService {
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     private readonly gamesClient: GamesClientService,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
     private readonly dataSource: DataSource,
     private readonly httpService: HttpService
   ) {}
 
-   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    try {
-      console.log("createOrderDto: ", createOrderDto);
-      const game = await this.gamesClient.getGameById(createOrderDto.gameId);
-      console.log("game: ", game);
-  
-      if (!game) {
-        throw new Error('Game not found');
-      }
-  
-      const { name, price } = game;
-  
-      const order = this.orderRepository.create({
-        gameId: createOrderDto.gameId,
-        gameName: name,
-        gamePrice: price,
-        quantity: createOrderDto.quantity,
-      });
-  
-      return await this.orderRepository.save(order);
-    } catch (err) {
-      throw err;
+async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  const orderItems: OrderItem[] = [];
+
+  for (const item of createOrderDto.items) {
+    const game = await this.gamesClient.getGameById(item.gameId);
+
+    if (!game) {
+      throw new Error(`Game with ID ${item.gameId} not found`);
     }
+
+    const orderItem = this.orderItemRepository.create({
+      gameId: item.gameId,
+      gameName: game.name,
+      gamePrice: game.price,
+      quantity: item.quantity,
+    });
+
+    orderItems.push(orderItem);
   }
 
-  async findAll() {
-    const url = `${GAMES_URL}`; // URL of Games Service
-    const response$ = this.httpService.get(url);
-    const response = await firstValueFrom(response$);
-    console.log('response: ', response.data);
+  const order = this.orderRepository.create({ items: orderItems });
+  return await this.orderRepository.save(order);
+}
 
-    return `This action returns all orders`;
-  }
+
+async findAll(): Promise<any[]> {
+  const orders = await this.orderRepository.find();
+
+  const enrichedOrders = await Promise.all(
+    orders.map(async (order) => {
+      const enrichedItems = await Promise.all(
+        order.items.map(async (item) => {
+          try {
+            const game = await this.gamesClient.getGameById(item.gameId);
+            return {
+              ...item,
+              game, 
+            };
+          } catch {
+            return {
+              ...item,
+              game: null,
+            };
+          }
+        }),
+      );
+
+      return {
+        ...order,
+        items: enrichedItems,
+      };
+    }),
+  );
+
+  return enrichedOrders;
+}
+
+
 
   findOne(id: number) {
     return `This action returns a #${id} order`;

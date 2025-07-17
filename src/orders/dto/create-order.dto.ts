@@ -1,7 +1,7 @@
 // create-order.dto.ts
-import { IsNumber, IsPositive } from 'class-validator';
-
-export class CreateOrderDto {
+import { IsNumber, IsPositive, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+export class CreateOrderItemDto {
   @IsNumber()
   @IsPositive()
   gameId: number;
@@ -9,4 +9,10 @@ export class CreateOrderDto {
   @IsNumber()
   @IsPositive()
   quantity: number;
+}
+
+export class CreateOrderDto {
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  items: CreateOrderItemDto[];
 }

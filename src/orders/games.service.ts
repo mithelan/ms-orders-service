@@ -11,7 +11,7 @@ export class GamesClientService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.gamesEndpoint = this.configService.get<string>('GAMES_ENDPOINT', 'http://localhost:3002');
+    this.gamesEndpoint = this.configService.get<string>('GAMES_ENDPOINT', 'http://localhost:3001');
   }
 
   async getGameById(id: number) {

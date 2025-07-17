@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service-app
+  labels:
+    app: orders-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-service-app
+  template:
+    metadata:
+      labels:
+        app: orders-service-app
+    spec:
+      containers:
+        - name: orders-service-container
+          image: orders-service:local
+          ports:
+            - containerPort: 3005
+          env:
+            - name: DATABASE
+              value: orders_iit_db
+            - name: DB_PORT
+              value: "3306"
+            - name: HOST
+              value: mysql-db
+            - name: PASSWORD
+              value: root1234
+            - name: PORT
+              value: "3005"
+            - name: USERNAME
+              value: root
+            - name: GAMES_ENDPOINT
+              value: http://localhost:3002
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3005
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3005
+            initialDelaySeconds: 15
+            periodSeconds: 20

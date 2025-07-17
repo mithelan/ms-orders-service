@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const PORT = process.env.SERVER_PORT
- || 3005;
+ || 3006;
 
   try {
     await app.listen(PORT);
