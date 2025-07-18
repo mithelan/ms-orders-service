@@ -11,6 +11,10 @@ phases:
       - mv kubectl /usr/local/bin/kubectl
       - kubectl version --client
 
+      - echo "Installing Helm..."
+      - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      - helm version
+
       - echo "Confirming AWS CLI identity..."
       - aws sts get-caller-identity
       - echo "Testing cluster access..."
@@ -49,14 +53,13 @@ phases:
       - aws eks update-kubeconfig --region ap-southeast-1 --name ms-lugx-cluster
   
       - echo "Testing cluster connection..."
-      - kubectl get svc
-  
+      - kubectl get svc -n orders
 
-      - echo "Deploying to EKS using rolling update..."
-      - kubectl set image deployment/orders-service-app orders-service-container=$REPOSITORY_URI:$IMAGE_TAG -n orders
-
-      - echo "Waiting for rollout to complete..."
-      - kubectl rollout status deployment/orders-service-app -n orders
+      - echo "Deploying with Helm upgrade..."
+      - helm upgrade orders-service ./helm --install --namespace orders \
+          --set image.repository=$REPOSITORY_URI \
+          --set image.tag=$IMAGE_TAG \
+          --wait
 
 
 artifacts:
