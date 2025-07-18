@@ -13,10 +13,13 @@ spec:
     metadata:
       labels:
         app: {{ .Values.app.name }}
+      annotations:
+        deploymentTimestamp: "{{ .Values.deploymentTimestamp }}"
     spec:
       containers:
         - name: {{ .Values.container.name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.container.port }}
           env:

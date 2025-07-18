@@ -28,7 +28,7 @@ mysql:
   storage: 5Gi
   storageClass: gp2
 
-
+deploymentTimestamp: ""
 
 service:
   type: LoadBalancer
