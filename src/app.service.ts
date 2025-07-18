@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   getHealth() {
-    return {status: 'OK', env: process.env.GAMES_ENDPOINT, service: 'Orders Service'};
+    return {status: 'OK', env: process.env.GAMES_ENDPOINT, service: 'Orders Service Endpoint System'};
   }
 }
