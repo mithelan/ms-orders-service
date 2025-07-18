@@ -56,10 +56,8 @@ phases:
       - kubectl get svc -n orders
 
       - echo "Deploying with Helm upgrade..."
-      - helm upgrade orders-service ./helm --install --namespace orders \
-          --set image.repository=$REPOSITORY_URI \
-          --set image.tag=$IMAGE_TAG \
-          --wait
+      - helm upgrade orders-service ./helm --install --namespace orders --set image.repository=$REPOSITORY_URI --set image.tag=$IMAGE_TAG --wait
+
 
 
 artifacts:
