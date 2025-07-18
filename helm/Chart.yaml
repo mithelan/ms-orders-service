@@ -1,6 +1,6 @@
 apiVersion: v2
 name: orders-service
-description: A Helm chart for the Lugx Orders Service
+description: A Helm chart for the orders microservice
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

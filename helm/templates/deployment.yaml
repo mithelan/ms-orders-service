@@ -1,50 +1,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orders-service-app
-  namespace: orders
+  name: {{ .Values.app.name }}
   labels:
-    app: orders-service-app
+    app: {{ .Values.app.name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: orders-service-app
+      app: {{ .Values.app.name }}
   template:
     metadata:
       labels:
-        app: orders-service-app
+        app: {{ .Values.app.name }}
     spec:
       containers:
-        - name: orders-service-container
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ .Values.container.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: {{ .Values.container.port }}
           env:
             - name: DATABASE
-              value: "{{ .Values.env.DATABASE }}"
+              value: {{ .Values.env.DATABASE }}
             - name: DB_PORT
               value: "{{ .Values.env.DB_PORT }}"
             - name: HOST
-              value: "{{ .Values.env.HOST }}"
+              value: {{ .Values.env.HOST }}
             - name: PASSWORD
-              value: "{{ .Values.env.PASSWORD }}"
+              value: {{ .Values.env.PASSWORD }}
             - name: PORT
               value: "{{ .Values.env.PORT }}"
             - name: USERNAME
-              value: "{{ .Values.env.USERNAME }}"
-            - name: GAMES_ENDPOINT
-              value: "{{ .Values.env.GAMES_ENDPOINT }}"
+              value: {{ .Values.env.USERNAME }}
           readinessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 10
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 15
             periodSeconds: 20

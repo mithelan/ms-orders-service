@@ -1,0 +1,44 @@
+app:
+  name: orders-service-app
+
+replicaCount: 1
+
+container:
+  name: orders-service-container
+  port: 3007
+
+image:
+  repository: 241856856673.dkr.ecr.ap-southeast-1.amazonaws.com/ms-orders-service
+  tag: latest
+
+env:
+  DATABASE: orders_iit_db
+  DB_PORT: "3306"
+  HOST: mysql-db
+  PASSWORD: root1234
+  PORT: "3007"
+  USERNAME: root
+
+mysql:
+  name: mysql-db
+  database: orders_iit_db
+  rootPassword: root1234
+  pvcName: mysql-data
+  storage: 5Gi
+  storageClass: gp2
+
+
+
+service:
+  type: LoadBalancer
+  port: 80
+
+
+ingress:
+  enabled: true
+  className: nginx
+  host: 13.250.183.84.sslip.io
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+
