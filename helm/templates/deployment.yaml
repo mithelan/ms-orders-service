@@ -32,6 +32,8 @@ spec:
               value: "{{ .Values.env.PORT }}"
             - name: USERNAME
               value: {{ .Values.env.USERNAME }}
+            - name: GAMES_ENDPOINT
+              value: {{ .Values.env.GAMES_ENDPOINT }}
           readinessProbe:
             httpGet:
               path: /health

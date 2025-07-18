@@ -18,6 +18,7 @@ env:
   PASSWORD: root1234
   PORT: "3007"
   USERNAME: root
+  GAMES_ENDPOINT: 13.250.183.84.sslip.io/games
 
 mysql:
   name: mysql-db
