@@ -18,7 +18,7 @@ env:
   PASSWORD: root1234
   PORT: "3007"
   USERNAME: root
-  GAMES_ENDPOINT: http://13.250.183.84.sslip.io/games
+  GAMES_ENDPOINT: http://13.214.63.50.sslip.io/games
 
 mysql:
   name: mysql-db
@@ -38,7 +38,7 @@ service:
 ingress:
   enabled: true
   className: nginx
-  host: 13.250.183.84.sslip.io
+  host: 13.214.63.50.sslip.io
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 
